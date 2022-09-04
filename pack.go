@@ -1,4 +1,4 @@
-package main
+package go_chrome_build
 
 import (
 	"github.com/go-bindata/go-bindata/v3"

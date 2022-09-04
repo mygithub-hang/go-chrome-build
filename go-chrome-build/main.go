@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	go_chrome_build "github.com/mygithub-hang/go-chrome-build"
 	"os"
 	"strings"
 )
@@ -42,7 +43,7 @@ func Run(cmd string) {
 		help()
 		terminal()
 	} else {
-		fmt.Println(GetCurrentPath())
+		fmt.Println(go_chrome_build.GetCurrentPath())
 		fmt.Println(cmd)
 	}
 }
@@ -57,14 +58,14 @@ func help() {
  h,help 	帮助
  exit		退出
 ---------------HELP---------------`
-	fmt.Println(cyan, helpText, reset)
+	fmt.Println(go_chrome_build.Cyan, helpText, go_chrome_build.Reset)
 }
 
 func terminal() {
-	cmdStr, err := AskForConfirmation(""+
+	cmdStr, err := go_chrome_build.AskForConfirmation(""+
 		"go-chrome-build>", "")
 	if err != nil {
-		EchoError(err.Error())
+		go_chrome_build.EchoError(err.Error())
 	}
 	if cmdStr == "exit" {
 		exit()

@@ -1,4 +1,4 @@
-package main
+package go_chrome_build
 
 import (
 	"bufio"
@@ -12,14 +12,14 @@ import (
 
 // 控制台颜色文字变量
 var (
-	green   = string([]byte{27, 91, 51, 50, 109})
-	white   = string([]byte{27, 91, 51, 55, 109})
-	yellow  = string([]byte{27, 91, 51, 51, 109})
-	red     = string([]byte{27, 91, 51, 49, 109})
-	blue    = string([]byte{27, 91, 51, 52, 109})
-	magenta = string([]byte{27, 91, 51, 53, 109})
-	cyan    = string([]byte{27, 91, 51, 54, 109})
-	reset   = string([]byte{27, 91, 48, 109})
+	Green   = string([]byte{27, 91, 51, 50, 109})
+	White   = string([]byte{27, 91, 51, 55, 109})
+	Yellow  = string([]byte{27, 91, 51, 51, 109})
+	Red     = string([]byte{27, 91, 51, 49, 109})
+	Blue    = string([]byte{27, 91, 51, 52, 109})
+	Magenta = string([]byte{27, 91, 51, 53, 109})
+	Cyan    = string([]byte{27, 91, 51, 54, 109})
+	Reset   = string([]byte{27, 91, 48, 109})
 )
 
 // IsExist 判断文件是否存在
@@ -53,12 +53,12 @@ func EchoError(i interface{}) {
 	// fmt.Println(blue, i, reset)
 	// fmt.Println(magenta, i, reset)
 	// fmt.Println(cyan, i, reset)
-	fmt.Println(magenta, i, reset)
+	fmt.Println(Magenta, i, Reset)
 }
 
 // EchoSuccess 彩色打印成功信息
 func EchoSuccess(i interface{}) {
-	fmt.Println(green, i, reset)
+	fmt.Println(Green, i, Reset)
 }
 
 // StringToArray 字符串转切片
