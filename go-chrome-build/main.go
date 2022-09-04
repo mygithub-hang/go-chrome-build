@@ -13,7 +13,8 @@ var (
 //reset = string([]byte{27, 91, 48, 109})
 )
 
-// go install -a -v github.com/mygithub-hang/go-chrome-build/go-chrome-build/...@latest
+// go get github.com/mygithub-hang/go-chrome-build
+// go install -a -v github.com/mygithub-hang/go-chrome-build/...
 // init 初始化
 func init() {
 	//flags := true
@@ -44,6 +45,7 @@ func Run(cmd string) {
 		terminal()
 	} else {
 		fmt.Println(go_chrome_build.GetCurrentPath())
+		fmt.Println(go_chrome_build.GetExcPath())
 		fmt.Println(cmd)
 	}
 }

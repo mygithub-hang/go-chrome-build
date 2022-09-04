@@ -2,8 +2,8 @@ package go_chrome_build
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -142,21 +142,19 @@ func ToUnderScore(s string) string {
 }
 
 // GetCurrentPath 获取当前文件位置
-func GetCurrentPath() (string, error) {
-	file, err := exec.LookPath(os.Args[0])
+func GetCurrentPath() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		return "", err
+		log.Fatal(err)
 	}
-	path, err := filepath.Abs(file)
-	if err != nil {
-		return "", err
-	}
-	i := strings.LastIndex(path, "/")
-	if i < 0 {
-		i = strings.LastIndex(path, "\\")
-	}
-	if i < 0 {
-		return "", errors.New(`error: Can't find "/" or "\".`)
-	}
-	return string(path[0 : i+1]), nil
+	return strings.Replace(dir, "\\", "/", -1)
+}
+
+// GetExcPath 获取执行位置
+func GetExcPath() string {
+	file, _ := exec.LookPath(os.Args[0])
+	path, _ := filepath.Abs(file)
+	index := strings.LastIndex(path, string(os.PathSeparator))
+	ret := path[:index]
+	return strings.Replace(ret, "\\", "/", -1)
 }
