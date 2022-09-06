@@ -6,11 +6,13 @@ import (
 	"strings"
 )
 
-func pack(packPath, packName string, dir []string) error {
+func Pack(packPath, packName string, dir []string) error {
 	cfg := bindata.NewConfig()
 	cfg.Output = packPath
 	cfg.Package = packName
 	cfg.Input = []bindata.InputConfig{}
+	cfg.HttpFileSystem = true
+	cfg.Prefix = "resources/"
 	for _, v := range dir {
 		cfg.Input = append(cfg.Input, parseInput(v))
 	}

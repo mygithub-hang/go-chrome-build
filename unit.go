@@ -2,7 +2,9 @@ package go_chrome_build
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -141,6 +143,15 @@ func ToUnderScore(s string) string {
 	return newStr
 }
 
+// GetWorkingDirPath 获取执行路径
+func GetWorkingDirPath() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return dir
+}
+
 // GetCurrentPath 获取当前文件位置
 func GetCurrentPath() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -157,4 +168,74 @@ func GetExcPath() string {
 	index := strings.LastIndex(path, string(os.PathSeparator))
 	ret := path[:index]
 	return strings.Replace(ret, "\\", "/", -1)
+}
+
+// IsFile 判断所给路径是否为文件
+func IsFile(path string) bool {
+	return !IsDir(path)
+}
+
+func appendToFile(fileName string, content string) {
+	// 以只写的模式，打开文件
+	f, err := os.OpenFile(fileName, os.O_WRONLY, 0644)
+	if err != nil {
+		EchoError("file create failed. err: " + err.Error())
+	} else {
+		// 查找文件末尾的偏移量
+		n, _ := f.Seek(0, os.SEEK_END)
+		// 从末尾的偏移量开始写入内容
+		_, err = f.WriteAt([]byte(content), n)
+	}
+	defer f.Close()
+	if err != nil {
+		EchoError(err.Error())
+	}
+}
+
+func getConfig() PackageConf {
+	runPath := GetCurrentPath()
+	fileContent, err := os.ReadFile(runPath + "/" + "package.json")
+	if err != nil {
+		fmt.Println("Read package.json error: " + err.Error())
+		os.Exit(1)
+		return PackageConf{}
+	}
+	jsonData := PackageConf{}
+	jsonData.RunBuildPath = runPath
+	err = json.Unmarshal(fileContent, &jsonData)
+	if err != nil {
+		fmt.Println("Unmarshal package.json error: " + err.Error())
+		os.Exit(1)
+		return PackageConf{}
+	}
+	if jsonData.ChromeVersion == 0 {
+		jsonData.ChromeVersion = 985258
+	}
+	return jsonData
+}
+
+// copyFile
+func copyFile(dstFileName string, srcFileName string) (written int64, err error) {
+	srcFile, err := os.Open(srcFileName)
+	if err != nil {
+		fmt.Printf("open file error = %v\n", err)
+	}
+	defer srcFile.Close()
+	reader := bufio.NewReader(srcFile)
+	dstFile, err := os.OpenFile(dstFileName, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		fmt.Printf("open file error = %v\n", err)
+		return
+	}
+	writer := bufio.NewWriter(dstFile)
+	defer dstFile.Close()
+	return io.Copy(writer, reader)
+}
+
+func createDir(filePath string) error {
+	if !IsExist(filePath) {
+		err := os.MkdirAll(filePath, os.ModePerm)
+		return err
+	}
+	return nil
 }

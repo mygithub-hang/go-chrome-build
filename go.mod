@@ -1,10 +1,8 @@
-module github.com/mygithub-hang/go-chrome-build
+module github.com/voyager-hang/go-chrome-build
 
 go 1.17
 
-require (
-	github.com/go-bindata/go-bindata/v3 v3.1.3
-)
+require github.com/go-bindata/go-bindata/v3 v3.1.3
 
 require (
 	github.com/kisielk/errcheck v1.2.0 // indirect
