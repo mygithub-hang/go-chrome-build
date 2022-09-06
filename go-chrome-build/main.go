@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	go_chrome_build "github.com/mygithub-hang/go-chrome-build"
+	go_chrome_build "github.com/voyager-hang/go-chrome-build"
 	"os"
 	"runtime"
 	"strings"
@@ -15,8 +15,8 @@ var (
 //reset = string([]byte{27, 91, 48, 109})
 )
 
-// go get github.com/mygithub-hang/go-chrome-build
-// go install -a -v github.com/mygithub-hang/go-chrome-build/...
+// go get github.com/voyager-hang/go-chrome-build
+// go install -a -v github.com/voyager-hang/go-chrome-build/...
 // init 初始化
 func init() {
 	flags := true

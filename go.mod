@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/go-bindata/go-bindata/v3 v3.1.3
-	github.com/mygithub-hang/go-chrome-build v1.0.0
 )
 
 require (
