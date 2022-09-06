@@ -1,9 +1,11 @@
 package go_chrome_build
 
 import (
+	"archive/zip"
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/fragmentization/mahonia"
 	"io"
 	"log"
 	"os"
@@ -236,6 +238,46 @@ func createDir(filePath string) error {
 	if !IsExist(filePath) {
 		err := os.MkdirAll(filePath, os.ModePerm)
 		return err
+	}
+	return nil
+}
+
+func UnPackZip(src, dir string) error {
+	reader, err := zip.OpenReader(src)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = reader.Close()
+	}()
+	prefix := ""
+	if dir != "" {
+		_ = os.MkdirAll(dir, os.ModePerm)
+		prefix = dir + "/"
+	}
+	for _, f := range reader.File {
+		info := f.FileInfo()
+		s := prefix + f.Name
+		decoder := mahonia.NewDecoder("gbk")
+		s = decoder.ConvertString(s)
+		if info.IsDir() {
+			_ = os.MkdirAll(s, os.ModePerm)
+			continue
+		}
+		open, err := f.Open()
+		if err != nil {
+			return err
+		}
+		create, err := os.Create(s)
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(create, open)
+		if err != nil {
+			return err
+		}
+		_ = create.Close()
+		_ = open.Close()
 	}
 	return nil
 }
