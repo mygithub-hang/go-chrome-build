@@ -3,13 +3,16 @@ package go_chrome_build
 import (
 	"archive/zip"
 	"bufio"
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/fragmentization/mahonia"
 	"io"
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -172,11 +175,6 @@ func GetExcPath() string {
 	return strings.Replace(ret, "\\", "/", -1)
 }
 
-// IsFile 判断所给路径是否为文件
-func IsFile(path string) bool {
-	return !IsDir(path)
-}
-
 func appendToFile(fileName string, content string) {
 	// 以只写的模式，打开文件
 	f, err := os.OpenFile(fileName, os.O_WRONLY, 0644)
@@ -210,8 +208,17 @@ func getConfig() PackageConf {
 		os.Exit(1)
 		return PackageConf{}
 	}
-	if jsonData.ChromeVersion == 0 {
-		jsonData.ChromeVersion = 985258
+	if jsonData.Name == "" {
+		EchoError("package.json name is empty")
+	}
+	if jsonData.ChromeVersion.Darwin == "" {
+		jsonData.ChromeVersion.Darwin = "985258"
+	}
+	if jsonData.ChromeVersion.Windows == "" {
+		jsonData.ChromeVersion.Windows = "985180"
+	}
+	if jsonData.ChromeVersion.Linux == "" {
+		jsonData.ChromeVersion.Linux = "985180"
 	}
 	return jsonData
 }
@@ -235,6 +242,7 @@ func copyFile(dstFileName string, srcFileName string) (written int64, err error)
 }
 
 func createDir(filePath string) error {
+	filePath = path.Dir(filePath)
 	if !IsExist(filePath) {
 		err := os.MkdirAll(filePath, os.ModePerm)
 		return err
@@ -280,4 +288,48 @@ func UnPackZip(src, dir string) error {
 		_ = open.Close()
 	}
 	return nil
+}
+
+func FilePutContent(path, content string) error {
+	err := createDir(path)
+	if err != nil {
+		return err
+	}
+	var f *os.File
+	if IsExist(path) {
+		f, err = os.OpenFile(path, os.O_WRONLY, 0600)
+		defer f.Close()
+	} else {
+		f, err = os.Create(path)
+	}
+	defer f.Close()
+	if err != nil {
+		// 创建文件失败处理
+		return err
+	} else {
+		_, err = f.Write([]byte(content))
+		if err != nil {
+			// 写入失败处理
+			return err
+		}
+	}
+	return nil
+}
+
+func RunCommand(path, name string, arg ...string) (msg string, err error) {
+	cmd := exec.Command(name, arg...)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	cmd.Dir = path
+	err = cmd.Run()
+	log.Println(cmd.Args)
+	if err != nil {
+		msg = fmt.Sprint(err) + ": " + stderr.String()
+		err = errors.New(msg)
+		log.Println("err", err.Error(), "cmd", cmd.Args)
+	}
+	log.Println(out.String())
+	return
 }
