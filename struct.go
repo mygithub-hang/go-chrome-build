@@ -1,13 +1,14 @@
 package go_chrome_build
 
 type PackageConf struct {
-	Name           string   `json:"name"`
-	ChromeExecPath string   `json:"chrome_exec_path"`
-	ChromePackPath Platform `json:"chrome_pack_path"`
-	ChromeVersion  Platform `json:"chrome_version"`
-	BuildCachePath string   `json:"build_cache_path"`
-	Icons          Platform `json:"icons"`
-	RunBuildPath   string   `json:"run_build_path"`
+	Name              string   `json:"name"`
+	ChromeExecPath    string   `json:"chrome_exec_path"`
+	IntegratedBrowser bool     `json:"integrated_browser"`
+	ChromePackPath    Platform `json:"chrome_pack_path"`
+	ChromeVersion     Platform `json:"chrome_version"`
+	BuildCachePath    string   `json:"build_cache_path"`
+	Icons             Platform `json:"icons"`
+	RunBuildPath      string   `json:"run_build_path"`
 }
 
 type Platform struct {

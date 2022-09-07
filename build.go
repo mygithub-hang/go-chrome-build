@@ -17,19 +17,27 @@ func DoBuild(sysType string) {
 	}
 	newBrowserPath := browserDir + "/" + browserName
 	defer os.Remove(newBrowserPath)
+	err = createDir(newBrowserPath)
+	if err != nil {
+		EchoError("copy browser dir err: " + err.Error())
+	}
 	_, err = copyFile(newBrowserPath, browserPath)
 	if err != nil {
 		EchoError("copy browser err: " + err.Error())
 		return
 	}
-	err = Pack(sysType+"_build.go", "main", []string{
+	buildDir := []string{
 		"./resources/...",
-		"./browser/...",
-	})
+	}
+	conf := getConfig()
+	if conf.IntegratedBrowser {
+		buildDir = append(buildDir, "./browser/...")
+	}
+	err = Pack(sysType+"_build.go", "main", buildDir)
 	if err != nil {
 		EchoError(err.Error())
 	} else {
-		EchoSuccess("Compilation complete.")
+		EchoSuccess("Build Compilation complete.")
 	}
 }
 
