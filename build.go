@@ -8,7 +8,7 @@ import (
 
 func DoBuild(sysType string) {
 	browserPath, browserName := getBrowserPath(sysType)
-	runPath := GetCurrentPath()
+	runPath := GetWorkingDirPath()
 	browserDir := runPath + "/browser"
 	err := createDir(browserDir)
 	if err != nil {
