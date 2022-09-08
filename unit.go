@@ -193,7 +193,7 @@ func appendToFile(fileName string, content string) {
 }
 
 func getConfig() PackageConf {
-	runPath := GetCurrentPath()
+	runPath := GetWorkingDirPath()
 	fileContent, err := os.ReadFile(runPath + "/" + "package.json")
 	if err != nil {
 		fmt.Println("Read package.json error: " + err.Error())
