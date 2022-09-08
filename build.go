@@ -7,33 +7,32 @@ import (
 )
 
 func DoBuild(sysType string) {
-	browserPath, browserName := getBrowserPath(sysType)
-	runPath := GetWorkingDirPath()
-	browserDir := runPath + "/browser"
-	err := createDir(browserDir)
-	if err != nil {
-		EchoError("create dir browser error")
-		return
-	}
-	newBrowserPath := browserDir + "/" + browserName
-	defer os.Remove(newBrowserPath)
-	err = createDir(newBrowserPath)
-	if err != nil {
-		EchoError("copy browser dir err: " + err.Error())
-	}
-	_, err = copyFile(newBrowserPath, browserPath)
-	if err != nil {
-		EchoError("copy browser err: " + err.Error())
-		return
+	conf := getConfig()
+	if conf.IntegratedBrowser {
+		browserPath, browserName := getBrowserPath(sysType)
+		runPath := GetWorkingDirPath()
+		browserDir := runPath + "/resources/browser"
+		err := createDir(browserDir)
+		if err != nil {
+			EchoError("create dir browser error")
+			return
+		}
+		newBrowserPath := browserDir + "/" + browserName
+		defer os.Remove(newBrowserPath)
+		err = createDir(newBrowserPath)
+		if err != nil {
+			EchoError("copy browser dir err: " + err.Error())
+		}
+		_, err = copyFile(newBrowserPath, browserPath)
+		if err != nil {
+			EchoError("copy browser err: " + err.Error())
+			return
+		}
 	}
 	buildDir := []string{
 		"./resources/...",
 	}
-	conf := getConfig()
-	if conf.IntegratedBrowser {
-		buildDir = append(buildDir, "./browser/...")
-	}
-	err = Pack(sysType+"_build.go", "main", buildDir)
+	err := Pack(sysType+"_build.go", "main", buildDir)
 	if err != nil {
 		EchoError(err.Error())
 	} else {
