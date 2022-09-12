@@ -20,7 +20,7 @@ var (
 // init 初始化
 func init() {
 	flags := true
-	runPath := go_chrome_build.GetCurrentPath()
+	runPath := go_chrome_build.GetWorkingDirPath()
 	if !go_chrome_build.IsExist(runPath + "/package.json") {
 		go_chrome_build.EchoError("当前目录下未找到：package.json 文件")
 		flags = false

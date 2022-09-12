@@ -157,14 +157,14 @@ func GetWorkingDirPath() string {
 	return dir
 }
 
-// GetCurrentPath 获取当前文件位置
-func GetCurrentPath() string {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-	return strings.Replace(dir, "\\", "/", -1)
-}
+//// GetCurrentPath 获取当前文件位置
+//func GetCurrentPath() string {
+//	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	return strings.Replace(dir, "\\", "/", -1)
+//}
 
 // GetExcPath 获取执行位置
 func GetExcPath() string {
@@ -193,7 +193,7 @@ func appendToFile(fileName string, content string) {
 }
 
 func getConfig() PackageConf {
-	runPath := GetCurrentPath()
+	runPath := GetWorkingDirPath()
 	fileContent, err := os.ReadFile(runPath + "/" + "package.json")
 	if err != nil {
 		fmt.Println("Read package.json error: " + err.Error())

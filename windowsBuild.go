@@ -24,8 +24,6 @@ func windowsPackWindows() {
 		"build",
 		"-ldflags",
 		"-H windowsgui",
-		"-o",
-		fmt.Sprintf("./output/%s.exe", conf.Name),
 	}
 	var cmd = exec.Command("go", args...)
 	var out bytes.Buffer

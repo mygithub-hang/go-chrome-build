@@ -29,7 +29,7 @@ var manifestContent string = `
 </assembly>`
 
 func BuildSysO() error {
-	runPath := GetCurrentPath()
+	runPath := GetWorkingDirPath()
 	err := FilePutContent(runPath+"/main.manifest", manifestContent)
 	defer os.Remove(runPath + "/main.manifest")
 	if err != nil {
