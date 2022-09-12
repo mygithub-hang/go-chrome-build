@@ -11,7 +11,7 @@ import (
 )
 
 func windowsPackDarwin() {
-
+	fmt.Println("拼命开发中...")
 }
 
 func windowsPackWindows() {
@@ -45,5 +45,5 @@ func windowsPackWindows() {
 }
 
 func windowsPackLinux() {
-
+	fmt.Println("拼命开发中...")
 }

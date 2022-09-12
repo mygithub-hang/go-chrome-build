@@ -11,7 +11,7 @@ import (
 )
 
 func darwinPackDarwin() {
-
+	fmt.Println("拼命开发中...")
 }
 
 func darwinPackWindows() {
@@ -24,8 +24,8 @@ func darwinPackWindows() {
 		"build",
 		"-ldflags",
 		"-H windowsgui",
-		"-o",
-		fmt.Sprintf("./output/%s.exe", conf.Name),
+		//"-o",
+		//fmt.Sprintf("./output/%s.exe", conf.Name),
 	}
 	var cmd = exec.Command("go", args...)
 	var out bytes.Buffer
@@ -52,5 +52,5 @@ func darwinPackWindows() {
 }
 
 func darwinPackLinux() {
-
+	fmt.Println("拼命开发中...")
 }
