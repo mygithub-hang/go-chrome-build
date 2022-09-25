@@ -200,7 +200,6 @@ func getConfig() PackageConf {
 		return PackageConf{}
 	}
 	jsonData := PackageConf{}
-	jsonData.RunBuildPath = runPath
 	err = json.Unmarshal(fileContent, &jsonData)
 	if err != nil {
 		fmt.Println("Unmarshal package.json error: " + err.Error())
@@ -211,10 +210,10 @@ func getConfig() PackageConf {
 		EchoError("package.json name is empty")
 	}
 	if jsonData.ChromeVersion.Darwin == "" {
-		jsonData.ChromeVersion.Darwin = "985258"
+		jsonData.ChromeVersion.Darwin = "980388"
 	}
 	if jsonData.ChromeVersion.Windows == "" {
-		jsonData.ChromeVersion.Windows = "985180"
+		jsonData.ChromeVersion.Windows = "980328"
 	}
 	if jsonData.ChromeVersion.Linux == "" {
 		jsonData.ChromeVersion.Linux = "985180"
@@ -331,4 +330,26 @@ func RunCommand(path, name string, arg ...string) (msg string, err error) {
 	}
 	log.Println(out.String())
 	return
+}
+
+func CreatePackageJson() {
+	runPath := GetWorkingDirPath()
+	filePath := runPath + "/package.json"
+	if IsExist(filePath) {
+		cmdStr, err := AskForConfirmation("The file already exists, whether to overwrite it?")
+		if err != nil {
+			EchoError(err.Error())
+		}
+		if cmdStr != "y" && cmdStr != "Y" {
+			os.Exit(0)
+		}
+	}
+	content := fmt.Sprintf(confTemp, runPath, runPath, runPath, runPath, runPath)
+	fmt.Println(runPath + "/package.json")
+	err := FilePutContent(filePath, content)
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Println("Create package.json success")
+	}
 }

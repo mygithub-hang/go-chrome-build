@@ -47,7 +47,7 @@ func main() {
 }
 
 func Run(cmd string) {
-	if cmd != "b" && cmd != "w" && cmd != "l" && cmd != "d" && cmd != "t" {
+	if cmd != "b" && cmd != "w" && cmd != "l" && cmd != "d" && cmd != "t" && cmd != "cp" {
 		help()
 		terminal()
 	} else {
@@ -60,9 +60,10 @@ func help() {
 ---------------HELP---------------
  t 		编译执行文件不打包
  b 		编译当前系统可执行文件
- w 		编译win X86可执行文件
+ w 		编译Win可执行文件
  l 		编译linux X86可执行文件
- d 		编译MacOs X86可执行文件
+ d 		编译MacOs可执行文件
+ cp 		创建package.json
  h,help 	帮助
  exit		退出
 ---------------HELP---------------`
@@ -99,6 +100,9 @@ func runPack(cmd string) {
 	case "d":
 		// 打包macos
 		go_chrome_build.PackMacOs()
+	case "cp":
+		// 创建package.json
+		go_chrome_build.CreatePackageJson()
 	}
 }
 

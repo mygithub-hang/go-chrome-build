@@ -17,9 +17,9 @@ type downloader struct {
 func (d *downloader) Read(p []byte) (n int, err error) {
 	n, err = d.Reader.Read(p)
 	d.Current += int64(n)
-	fmt.Printf("\rDownloading... %.2f%%", float64(d.Current*10000/d.Total)/100)
+	fmt.Printf("\rBrowser Downloading... %.2f%%", float64(d.Current*10000/d.Total)/100)
 	if d.Current == d.Total {
-		fmt.Printf("\rDownload completed %.2f%%", float64(d.Current*10000/d.Total)/100)
+		fmt.Printf("\rBrowser Download completed %.2f%%", float64(d.Current*10000/d.Total)/100)
 	}
 	return
 }

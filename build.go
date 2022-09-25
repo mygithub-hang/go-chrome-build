@@ -7,21 +7,11 @@ import (
 	"strings"
 )
 
-func DoBuild(sysType string, architecture ...string) {
-	architectureName := "amd64" // 386
-	if len(architecture) != 0 {
-		if architecture[0] == "amd64" {
-
-		} else if architecture[0] == "386" {
-			architectureName = "386"
-		} else {
-			panic("architecture error")
-		}
-	}
+func DoBuild(sysType string) {
 	conf := getConfig()
 	if conf.IntegratedBrowser {
 		// 获取浏览器位置
-		browserPath, browserName := getBrowserPath(sysType)
+		browserPath, browserName, packageMsg := getBrowserPath(sysType)
 		// 获取打包浏览器位置
 		runPath := GetWorkingDirPath()
 		browserDir := runPath + "/resources/browser"
@@ -31,53 +21,18 @@ func DoBuild(sysType string, architecture ...string) {
 			return
 		}
 		newBrowserPath := browserDir + "/" + browserName
-		//defer os.Remove(newBrowserPath)
+		defer os.Remove(newBrowserPath)
 		err = createDir(newBrowserPath)
 		if err != nil {
 			EchoError("copy browser dir err: " + err.Error())
 		}
-		if !IsExist(newBrowserPath) {
-			// 打包目录不存在文件
-			sysStruct := ""
-			version := ""
-			sys := ""
-			if browserPath == "" {
-				// 浏览器不存在 下载到打包目录
-				switch sysType {
-				case "darwin":
-					version = conf.ChromeVersion.Darwin
-					sys = "darwin"
-					if architectureName == "386" {
-						panic("MacOs does not support 386")
-					} else {
-						sysStruct = "Mac"
-					}
-				case "linux":
-					version = conf.ChromeVersion.Linux
-					sys = "linux"
-					if architectureName == "386" {
-						panic("linux does not support 386")
-					} else {
-						sysStruct = "Linux_x64"
-					}
-				case "windows":
-					version = conf.ChromeVersion.Windows
-					sys = "win"
-					if architectureName == "386" {
-						sysStruct = "Win"
-					} else {
-						sysStruct = "Win_x64"
-					}
-				}
-				DownBrowser(sysStruct, version, sys, newBrowserPath)
-			} else {
-				// 存在直接复制
-				_, err = copyFile(newBrowserPath, browserPath)
-				if err != nil {
-					EchoError("copy browser err: " + err.Error())
-					return
-				}
-			}
+		if !IsExist(browserPath) {
+			DownBrowser(packageMsg.sysStruct, packageMsg.version, packageMsg.osName, browserPath)
+		}
+		_, err = copyFile(newBrowserPath, browserPath)
+		if err != nil {
+			EchoError("copy browser err: " + err.Error())
+			return
 		}
 	}
 	buildDir := []string{
@@ -152,19 +107,39 @@ func PackNowSys() {
 	}
 }
 
-func getBrowserPath(sysType string) (string, string) {
+func getBrowserPath(sysType string) (string, string, packageMsg) {
+	// 浏览器不存在 下载到打包目录
 	packConfig := getConfig()
 	browserPath := ""
 	browserName := ""
+	packageData := packageMsg{
+		sysStruct: "",
+		version:   "",
+		osName:    "",
+	}
 	switch sysType {
 	case "darwin":
 		browserName = "chrome-mac.zip"
-		if packConfig.ChromePackPath.Darwin != "" && IsExist(packConfig.ChromePackPath.Darwin) {
-			if !strings.HasSuffix(packConfig.ChromePackPath.Darwin, "chrome-mac.zip") {
-				EchoError("filename must be chrome-mac.zip")
-				os.Exit(1)
+		packageData.version = packConfig.ChromeVersion.Darwin
+		packageData.osName = "darwin"
+		if packConfig.DarwinAppleChip {
+			packageData.sysStruct = "Mac_Arm"
+			if packConfig.ChromePackPath.DarwinArm != "" && IsExist(packConfig.ChromePackPath.DarwinArm) {
+				if !strings.HasSuffix(packConfig.ChromePackPath.DarwinArm, "chrome-mac.zip") {
+					EchoError("filename must be chrome-mac.zip")
+					os.Exit(1)
+				}
+				browserPath = packConfig.ChromePackPath.DarwinArm
 			}
-			browserPath = packConfig.ChromePackPath.Darwin
+		} else {
+			packageData.sysStruct = "Mac"
+			if packConfig.ChromePackPath.Darwin != "" && IsExist(packConfig.ChromePackPath.Darwin) {
+				if !strings.HasSuffix(packConfig.ChromePackPath.Darwin, "chrome-mac.zip") {
+					EchoError("filename must be chrome-mac.zip")
+					os.Exit(1)
+				}
+				browserPath = packConfig.ChromePackPath.Darwin
+			}
 		}
 	case "linux":
 		browserName = "chrome-linux.zip"
@@ -175,20 +150,42 @@ func getBrowserPath(sysType string) (string, string) {
 			}
 			browserPath = packConfig.ChromePackPath.Linux
 		}
+
+		packageData.version = packConfig.ChromeVersion.Linux
+		packageData.osName = "linux"
+		packageData.sysStruct = "Linux_x64"
 	case "windows":
 		browserName = "chrome-win.zip"
-		if packConfig.ChromePackPath.Windows != "" && IsExist(packConfig.ChromePackPath.Windows) {
-			if !strings.HasSuffix(packConfig.ChromePackPath.Windows, "chrome-win.zip") {
-				EchoError("filename must be chrome-win.zip")
-				os.Exit(1)
+
+		packageData.version = packConfig.ChromeVersion.Windows
+		packageData.osName = "win"
+		if packConfig.WindowsArch == "386" {
+			packageData.sysStruct = "Win"
+			if packConfig.ChromePackPath.Windows != "" && IsExist(packConfig.ChromePackPath.Windows) {
+				if !strings.HasSuffix(packConfig.ChromePackPath.Windows, "chrome-win.zip") {
+					EchoError("filename must be chrome-win.zip")
+					os.Exit(1)
+				}
+				browserPath = packConfig.ChromePackPath.Windows
 			}
-			browserPath = packConfig.ChromePackPath.Windows
+		} else {
+			packageData.sysStruct = "Win_x64"
+			if packConfig.ChromePackPath.Windows64 != "" && IsExist(packConfig.ChromePackPath.Windows64) {
+				if !strings.HasSuffix(packConfig.ChromePackPath.Windows64, "chrome-win.zip") {
+					EchoError("filename must be chrome-win.zip")
+					os.Exit(1)
+				}
+				browserPath = packConfig.ChromePackPath.Windows64
+			}
 		}
 	}
-	return browserPath, browserName
+	if browserPath == "" {
+		browserPath = GetWorkingDirPath() + "/browser/" + packageData.sysStruct + "/" + browserName
+	}
+	return browserPath, browserName, packageData
 }
 
-func DownBrowser(sysStruct, version, sys, downPath string) string {
+func DownBrowser(sysStruct, version, osName, downPath string) string {
 	sysStructArr := map[string]string{
 		"Linux_x64": "",
 		"Mac":       "",
@@ -200,16 +197,23 @@ func DownBrowser(sysStruct, version, sys, downPath string) string {
 		panic("System Architecture is not in the list;{Linux_x64,Mac,Mac_Arm,Win,Win_x64}")
 	}
 	downUrl := fmt.Sprintf("https://registry.npmmirror.com/-/binary/chromium-browser-snapshots/%s/%s/chrome-%s.zip",
-		sysStruct, version, sys)
+		sysStruct, version, osName)
 	if downPath == "" {
-		downPath = GetWorkingDirPath() + fmt.Sprintf("/browser/chrome-%s.zip", sys)
+		panic("downPath is empty")
 	}
-	err := DownloadFile(downUrl, downPath+".tmp")
+	err := createDir(downPath)
+	if err != nil {
+		panic(err)
+	}
+	err = DownloadFile(downUrl, downPath+".tmp")
 	if err != nil {
 		_ = os.Remove(downPath + ".tmp")
 		panic(err)
 	} else {
-		_ = os.Rename(downPath+".tmp", downPath)
+		err = os.Rename(downPath+".tmp", downPath)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return downPath
 }

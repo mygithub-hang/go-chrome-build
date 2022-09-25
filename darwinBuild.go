@@ -25,7 +25,7 @@ func darwinPackWindows(architecture ...string) {
 			panic("architecture error")
 		}
 	}
-	conf := getConfig()
+	//conf := getConfig()
 	gp := os.Getenv("GOPATH")
 	if len(gp) == 0 {
 		gp = build.Default.GOPATH
@@ -37,11 +37,12 @@ func darwinPackWindows(architecture ...string) {
 		//"-o",
 		//fmt.Sprintf("./output/%s.exe", conf.Name),
 	}
+	fmt.Println("build Windows " + architectureName)
 	var cmd = exec.Command("go", args...)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Env = os.Environ()
-	cmd.Dir = conf.RunBuildPath
+	cmd.Dir = GetWorkingDirPath()
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 	cmd.Env = append(cmd.Env,
