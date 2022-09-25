@@ -35,7 +35,7 @@ func windowsPackWindows(architecture ...string) {
 		"-ldflags",
 		"-H windowsgui",
 	}
-	fmt.Println("build Windows " + architectureName)
+	fmt.Println("Build Windows " + architectureName)
 	var cmd = exec.Command("go", args...)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
