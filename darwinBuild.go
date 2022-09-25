@@ -14,7 +14,17 @@ func darwinPackDarwin() {
 	fmt.Println("拼命开发中...")
 }
 
-func darwinPackWindows() {
+func darwinPackWindows(architecture ...string) {
+	architectureName := "amd64" // 386
+	if len(architecture) != 0 {
+		if architecture[0] == "amd64" {
+
+		} else if architecture[0] == "386" {
+			architectureName = "386"
+		} else {
+			panic("architecture error")
+		}
+	}
 	conf := getConfig()
 	gp := os.Getenv("GOPATH")
 	if len(gp) == 0 {
@@ -37,7 +47,7 @@ func darwinPackWindows() {
 	cmd.Env = append(cmd.Env,
 		"CGO_ENABLED=0",
 		"GOOS=windows",
-		"GOARCH=amd64",
+		"GOARCH="+architectureName,
 		"GOPATH="+gp,
 		//"GOARCH=",
 	)

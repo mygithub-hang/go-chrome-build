@@ -13,7 +13,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"strings"
 )
 
@@ -167,13 +166,13 @@ func GetWorkingDirPath() string {
 //}
 
 // GetExcPath 获取执行位置
-func GetExcPath() string {
-	file, _ := exec.LookPath(os.Args[0])
-	path, _ := filepath.Abs(file)
-	index := strings.LastIndex(path, string(os.PathSeparator))
-	ret := path[:index]
-	return strings.Replace(ret, "\\", "/", -1)
-}
+//func GetExcPath() string {
+//	file, _ := exec.LookPath(os.Args[0])
+//	path, _ := filepath.Abs(file)
+//	index := strings.LastIndex(path, string(os.PathSeparator))
+//	ret := path[:index]
+//	return strings.Replace(ret, "\\", "/", -1)
+//}
 
 func appendToFile(fileName string, content string) {
 	// 以只写的模式，打开文件
